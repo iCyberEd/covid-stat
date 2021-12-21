@@ -6,33 +6,34 @@ $radius: 20px;
   box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
 }
 
+
+//  HEADER
+//    Search
+//  MAIN LIST
+//    List element
+//    List header
+//      Unsorted header
+//      Sorted header
+//  MODAL WINDOW
+
 body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin: 0;
   font-family: 'Roboto', sans-serif;
   font-weight: 700;
   font-size: 24px;
-  /* -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif; */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   overflow: visible;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-.main-wrapper {
-  // width: 90%;
+#root {
+  width: 90%;
 }
 
 .main-wrapper__modal {
-  // width: 90%;
   filter: blur(2px);
 }
 
@@ -69,8 +70,6 @@ header {
   font-size: 2rem;
   font-weight: 400;
   height: 80px;
-  // min-width: 200px;
-  // max-width: 600px;
   width: 600px;
   padding: 12px 32px;
   color: $bg-color;
@@ -84,7 +83,6 @@ header {
   position: absolute;
   transform: translate(-150%, -50%);
   background-color: white;
-  // right: 150px;
   top: 50%;
   cursor: pointer;
   transform-origin: center;
@@ -139,37 +137,75 @@ header {
   }
 }
 
+// TODO make smooth transition on mouseout
 .country-list__element:hover {
   background-color: #f3f3f3;
+  cursor: pointer;
+
+  * {
+    transition: all 0.3s;
+  }
 
   *:nth-child(2) {
     color: $primary-color;
   }
 }
 
-// TODO make smooth transition on mouseout
-.country-list__element:hover, .country-list__header:hover {
-  cursor: pointer;
-  * {
-    transition: all 0.3s;
-  }
-}
-
-.country-list__header {
+// List header
+.country-list__headers {
   @extend %list-element;
   background-color: $primary-color;
+  color: white;
 
   :not(:first-child) {
     border-color: #ffffff;
   }
+}
 
-  *:hover::after {
+.country-list__header {
+  position: relative;
+  cursor: pointer;
+}
+
+%header-after {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  position: absolute;
+  margin-left: .3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+}
+
+// Unsorted header
+.country-list__header::after {
     content: "\21F5";
     position: absolute;
     margin-left: .3rem;
-  }
 }
 
+.country-list__header:hover::after {
+  color: black;
+}
+
+// Sorted header
+.ascending::after {
+  @extend %header-after;
+  -webkit-mask-image: url("./ascending.svg");
+  mask-image: url("./ascending.svg");
+}
+
+.descending::after {
+  @extend %header-after;
+  -webkit-mask-image: url("./descending.svg");
+  mask-image: url("./descending.svg");
+}
+
+.ascending:hover::after, .descending:hover::after {
+  background-color: black;
+}
 
 
 // Modal window - Country info

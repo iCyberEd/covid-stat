@@ -9,7 +9,7 @@ export default function Search({filterByCountry}) {
     <div className='search'>
       <input type="text" name="" id="" className='search__line' placeholder='Search...' onInput={ e => setsearchState(e.target.value) } value={searchState} />
       <button className='search__button' onClick={ (e) => filterByCountry(searchState) }>
-        <img src={magnifier} alt="" srcSet="" />
+        <img src={magnifier} alt="magnifier" />
       </button>
     </div>
   )

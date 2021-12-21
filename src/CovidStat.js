@@ -1,20 +1,21 @@
 import React, {useState, useEffect} from 'react'
-import './App.scss';
 import Country from './Country';
 import logo from './logo.png'
 import Search from './Search';
 
 // TODO Add loading icon before api loaded
-// Add click outside modal window
+// TODO Add click outside modal window
+// TODO add total stats to the end or top of the list
+// TODO add link to logo to main page
 
 const rawData = []
 
-function App() {
+function CovidStat() {
   const [covidData, setCovidData] = useState([])
   const [covidElements, setCovidElements] = useState([])
   const [countryModal, setCountryModal] = useState(false)
   const [countryData, setCountryData] = useState({})
-  // let countryData = {}
+  const [sortOrder, setSortOrder] = useState({id: "ascend"})
   
   useEffect(() => {
     console.log("useEffect initiation");
@@ -34,46 +35,52 @@ function App() {
 
   useEffect(() => {
     console.log("useEffect covidData");
+    let isAscend = Object.values(sortOrder)[0] === "ascend"
     let countriesArrEl = covidData.map( (country, ind) => {
       return (<li key={country.id} className='country-list__element' onClick={ () => countryClick(country) }>
-        <div className="country-list__element__index">{country.id}</div>
+        <div className="country-list__element__index">{isAscend ? ind + 1 : covidData.length - ind}</div>
         <div className="country">{country.Country}</div>
-        {/* <div className="NewConfirmed">{country.NewConfirmed}</div> */}
         <div className="TotalConfirmed">{country.TotalConfirmed}</div>
-        {/* <div className="NewDeaths">{country.NewDeaths}</div>
-        <div className="TotalDeaths">{country.TotalDeaths}</div>
-        <div className="NewRecoverd">{country.NewRecoverd}</div>
-        <div className="TotalRecovered">{country.TotalRecovered}</div>
-        <td className="Date">Date: {country.Date}</td> */}
       </li>)
     })
     setCovidElements([...countriesArrEl])
   }, [covidData])
 
 
-  // TODO: make reverse sorting
   function covidTableSort(headerName) {
     let dataCopy = [...covidData]
-    dataCopy.sort( (firstEl, secondEl) => {
-      // console.log(firstEl[headerName]);
-      if (typeof firstEl[headerName] === "string" && typeof secondEl[headerName] === "string") {
-        return firstEl[headerName].localeCompare(secondEl[headerName])
-      }
+    let newSortType = undefined // set 1 to ascend, -1 to descend
 
-      if (typeof firstEl[headerName] === "number" && typeof secondEl[headerName] === "number") {
-        return firstEl[headerName] - secondEl[headerName]
+    if ( sortOrder.hasOwnProperty(headerName) ) {
+      // flip the value if sorted by the same value the previous time
+      newSortType = sortOrder[headerName] === "ascend" ? -1 : 1
+    } else {
+      if (headerName === "id" || headerName === "Country") {
+        newSortType = 1
+      } else {
+        newSortType = -1
       }
-      
-      return 0
+    }
+
+    dataCopy.sort( (firstEl, secondEl) => {
+      let sameType = typeof firstEl[headerName] === typeof secondEl[headerName]
+      let elType = sameType && typeof firstEl[headerName]
+      console.log(elType);
+      if (elType === "number") {
+        return (firstEl[headerName] - secondEl[headerName]) * newSortType
+      } else {
+        return (firstEl[headerName].localeCompare(secondEl[headerName])) * newSortType
+      }
     })
-    // console.log(covidData);
+    let obj = {}
+    obj[headerName] = newSortType === 1 ? "ascend" : "descend"
+    setSortOrder({...obj})
     setCovidData([...dataCopy])
   }
 
   function filterByCountry(countryName) {
     const searchInput = countryName.toLowerCase()
-    console.log(rawData);
-    let result = rawData.filter( (el, ind) => {
+    let result = rawData.filter( (el) => {
       const countryName = el.Country.toLowerCase()
       return countryName.includes(searchInput)
     })
@@ -86,10 +93,18 @@ function App() {
   }
 
   function countryClick(country) {
-    // countryData = country
     setCountryData(country)
-    // console.log(country);
     toggleModal()
+  }
+
+  function getHeaderClass(headerClass) {
+    let thisClassName = "country-list__header"
+
+    if (sortOrder.hasOwnProperty(headerClass)) {
+      thisClassName += sortOrder[headerClass] === "ascend" ? " ascending" : " descending"
+    }
+
+    return thisClassName
   }
 
 
@@ -103,15 +118,10 @@ function App() {
         </header>
         
         <ul className='country-list'>
-            <li className='country-list__header'>
-              <div className='country-list__element__index' onClick={ () => covidTableSort("id") }>№</div>
-              <div onClick={ () => covidTableSort("Country") }>Country</div>
-              {/* <div onClick={ () => covidTableSort("NewConfirmed") }>New confirmed</div> */}
-              <div onClick={ () => covidTableSort("TotalConfirmed") }>Total confirmed</div>
-              {/* <div onClick={ () => covidTableSort("NewDeaths") }>New deaths</div>
-              <div onClick={ () => covidTableSort("TotalDeaths") }>Total deaths</div>
-              <div onClick={ () => covidTableSort("NewRecoverd") }>New recoverd</div>
-              <div onClick={ () => covidTableSort("TotalRecovered") }>Total recovered</div> */}
+            <li className='country-list__headers'>
+              <div className='country-list__element__index'>№</div>
+              <div className={getHeaderClass("Country")} onClick={ () => covidTableSort("Country") }>Country</div>
+              <div className={getHeaderClass("TotalConfirmed")} onClick={ () => covidTableSort("TotalConfirmed") }>Total confirmed</div>
             </li>
             {covidElements}
         </ul>
@@ -122,4 +132,4 @@ function App() {
   );
 }
 
-export default App;
+export default CovidStat;

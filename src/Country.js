@@ -11,17 +11,17 @@ export default function Country({countryData, toggleModal}) {
         <h3>{countryData.Country}</h3>
         <ul className='country-modal__list'>
           <li>
-            <img src={totConfirmed} alt="" srcSet="" />
+            <img src={totConfirmed} alt="total confirmed" />
             <span>Total Confirmed</span>
             <span>{countryData.TotalConfirmed}</span>
           </li>
           <li>
-            <img src={totDeaths} alt="" srcSet="" />
+            <img src={totDeaths} alt="total deaths" />
             <span>Total Deaths</span>
             <span>{countryData.TotalDeaths}</span>
           </li>
           <li>
-            <img src={totRecovered} alt="" srcSet="" />
+            <img src={totRecovered} alt="total recovered" />
             <span>Total Recovered</span>
             <span>{countryData.TotalRecovered}</span>
           </li>
