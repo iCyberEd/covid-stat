@@ -4,7 +4,6 @@ import logo from './logo.png'
 import loading from './loading.svg'
 import Search from './Search';
 
-// TODO Add click outside modal window
 // TODO add total stats to the end or top of the list
 
 const rawData = []
@@ -14,23 +13,20 @@ function CovidStat() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [covidData, setCovidData] = useState([])
   const [covidElements, setCovidElements] = useState([])
-  const [countryModal, setCountryModal] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [countryData, setCountryData] = useState({})
   const [sortOrder, setSortOrder] = useState({Country: "ascend"})
 
-  const toggleModal = useCallback(() => {
-    setCountryModal(!countryModal)
+  const toggleModal = useCallback((modalState) => {
+    setIsModalOpen( function(currentState) { return !currentState} )
     document.body.style.overflow = document.body.style.overflow === "hidden" ? "visible" : "hidden"
-  }, [countryModal])
+  }, [])
   
   useEffect(() => {
-    console.log("useEffect initiation");
     setTimeout(() => {
     fetch('https://api.covid19api.com/summary')
       .then( response => response.json() )
       .then( json => {
-        console.log(json)
-
         // catching error: when page not found covid19api returns json
         if (json.message) {
           throw json
@@ -47,7 +43,6 @@ function CovidStat() {
         setCovidData([...countriesArr])
       })
       .catch((error) => {
-        console.dir(error)
         setIsLoaded(true)
         setError(error)
       })
@@ -60,7 +55,6 @@ function CovidStat() {
       toggleModal()
     }
 
-    console.log("useEffect covidData");
     let isAscend = Object.values(sortOrder)[0] === "ascend"
     let countriesArrEl = covidData.map( (country, ind) => {
       return (<li key={country.id} className='country-list__element' onClick={ () => countryClick(country) }>
@@ -70,6 +64,7 @@ function CovidStat() {
       </li>)
     })
     setCovidElements([...countriesArrEl])
+
   }, [covidData, sortOrder, toggleModal])
 
 
@@ -91,7 +86,7 @@ function CovidStat() {
     dataCopy.sort( (firstEl, secondEl) => {
       let sameType = typeof firstEl[headerName] === typeof secondEl[headerName]
       let elType = sameType && typeof firstEl[headerName]
-      console.log(elType);
+
       if (elType === "number") {
         return (firstEl[headerName] - secondEl[headerName]) * newSortType
       } else {
@@ -146,7 +141,7 @@ function CovidStat() {
 
   return (
     <>
-      <div className={countryModal ? "main-wrapper__modal" : "main-wrapper"}>
+      <div className={isModalOpen ? "main-wrapper__modal" : "main-wrapper"}>
         <header>
           <a href="/" className='homepage-link'>
             <img src={logo} alt="covid19statistic.com" className='logo'></img>
@@ -157,7 +152,7 @@ function CovidStat() {
         {renderingLoadingState()}
       </div>
 
-      {countryModal && <Country countryData={countryData} toggleModal={toggleModal.bind(this)} />}
+      {isModalOpen && <Country countryData={countryData} toggleModal={toggleModal.bind(this)} />}
     </>
   );
 }
